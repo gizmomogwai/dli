@@ -1,0 +1,6 @@
+name "dor"
+description "A thor like cli implementation."
+copyright "Copyright © 2015, gizmo"
+authors "gizmo"
+license "MIT"
+dependency "dunit" version="*"

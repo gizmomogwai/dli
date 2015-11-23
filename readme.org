@@ -1,0 +1,4 @@
+* TODO how to associate short flag with long flag
+* TODO how to do subcommands
+* DONE parse long flags
+
