@@ -1,6 +1,7 @@
 {
 	"fileVersion": 1,
 	"versions": {
+		"rainbow": "0.0.2",
 		"dunit": "1.0.12"
 	}
 }

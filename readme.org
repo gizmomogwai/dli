@@ -1,4 +1,21 @@
-* TODO how to associate short flag with long flag
-* TODO how to do subcommands
-* DONE parse long flags
+* DLI - Thor for dlang  [[https://raw.githubusercontent.com/gizmomogwai/dli/master/logo.png]]
 
+** Todos
+*** COMMANDS
+    commands are taken by @Command on methods
+*** FLAGS
+**** DONE parse long flags
+**** DONE flags
+   - taken from method parameters
+   - are always true or false
+**** TODO how to associate short flag with long flag
+     @Flag("long", "short", "description")
+     long is given in the paremeters of the method
+*** OPTIONS
+**** TODO how to access global options or options from a parent command
+     thor references them with parent_options
+*** SUBCOMMANDS
+**** TODO how to do subcommands
+*** STYLE
+**** DONE rename to dli
+**** DONE create logo
