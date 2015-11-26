@@ -1,5 +1,7 @@
-* DLI - Thor for dlang  [[https://raw.githubusercontent.com/gizmomogwai/dli/master/logo.png]]
-
+* DLI - Thor for dlang
+#+BEGIN_CENTER
+[[https://raw.githubusercontent.com/gizmomogwai/dli/master/logo.png]]
+#+END_CENTER
 ** Todos
 *** COMMANDS
     commands are taken by @Command on methods
