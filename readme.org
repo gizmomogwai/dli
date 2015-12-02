@@ -2,17 +2,29 @@
 #+BEGIN_CENTER
 [[https://raw.githubusercontent.com/gizmomogwai/dli/master/logo.png]]
 #+END_CENTER
+
 ** Todos
+*** GENNERAL
+    do as much as possible at runtime. best to just create one or two
+    structs at compile time, that transport compile time information
+    to the runtime.
+
 *** COMMANDS
     commands are taken by @Command on methods
 *** FLAGS
+
+    Flags are special options. always true or false, but you do not
+    have to give this as parameter. simply quoting the flag is
+    enough. As they always default to false.
+
 **** DONE parse long flags
+**** TODO parse short flags
 **** DONE flags
    - taken from method parameters
    - are always true or false
 **** TODO how to associate short flag with long flag
      @Flag("long", "short", "description")
-     long is given in the paremeters of the method
+     long is given in the parameters of the method
 *** OPTIONS
 **** TODO how to access global options or options from a parent command
      thor references them with parent_options
@@ -21,3 +33,4 @@
 *** STYLE
 **** DONE rename to dli
 **** DONE create logo
+(require 'org-inlinetask)

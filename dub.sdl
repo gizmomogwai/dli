@@ -1,4 +1,4 @@
-name "dor"
+name "dli"
 description "A thor like cli implementation."
 copyright "Copyright © 2015, gizmo"
 authors "gizmo"
