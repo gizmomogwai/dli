@@ -1,5 +1,6 @@
 desc 'build and run tests'
 task :test do
+  sh "dub clean"
   sh "dub test"
 end
 
