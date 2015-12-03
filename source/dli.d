@@ -15,19 +15,20 @@ import dunit.toolkit;
  + Its values are initialized to false by default, and are updated with the
  + values from the commandline.
  +/
-class Option {
+public class Option {
   string name;
   string shortname;
   string description;
   string value;
   string defaultValue;
-  private this(string n, string v) {
+
+  this(string n, string v) {
     name = n;
     value = v;
     defaultValue = "false";
   }
 
-  private this(string n) {
+  this(string n) {
     this(n, "false");
   }
 
@@ -144,7 +145,7 @@ string createTaskInfo(T, string member)() {
 string createTransformStaticToRuntimeMethod(T)() {
   string res;
   res ~= "override protected Tasks transformStaticToRuntime() {\n";
-  res ~= "  Tasks res = new Tasks();\n";
+  res ~= "  auto res = new Tasks();\n";
   res ~= foreachMemberWithAttribute!(T, Option)
     (member => "  res.add(new Option(\"" ~ member ~ "\"));\n");
   foreach (member; __traits(allMembers, T)) {

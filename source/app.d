@@ -1,5 +1,7 @@
 module app;
 
+import std.format;
+import std.stdio;
 import dli;
 
 class Executor {
@@ -8,7 +10,7 @@ class Executor {
 
 class TestExecutor : Executor {
   string history;
-  void execute(string command) {
+  override void execute(string command) {
     history ~= command;
   }
   void reset() {
@@ -17,7 +19,7 @@ class TestExecutor : Executor {
 }
 
 class RealExecutor : Executor {
-  void execute(string command) {
+  override void execute(string command) {
     writeln(command);
   }
 }
