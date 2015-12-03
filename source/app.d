@@ -1,4 +1,5 @@
 module app;
+
 import dli;
 
 class Executor {
@@ -41,7 +42,6 @@ class Git : Dli {
   }
 
   mixin(createDli!(Git));
-
 }
 
 /// unknown options result in exceptions

@@ -3,34 +3,50 @@
 [[https://raw.githubusercontent.com/gizmomogwai/dli/master/logo.png]]
 #+END_CENTER
 
+** Usage
+
+Dli is used by extending the class Dli. The resulting commandline is
+craeted by tagging each member of the class that should contribute to
+the commandline with @Option or @Task.
+
+** Tasks
+
+Every method tagged with @Task is exposed to the commandline. The
+names of the methods arguments are used to fine tune the tasks.
+
+e.g. for a commandline like
+
+#+BEGIN_SRC shell
+./git test --interactive --verbose=3
+#+END_SRC
+
+your method would be called like this:
+#+BEGIN_SRC d
+test(string interactive/* with "true" */, string verbose/* with "3" */);
+#+END_SRC
+
+The 'help' task is already predefined in Dli, so every program should
+have sinsible help.
+
+** Options
+
+Options are always written as --name=value. If value is left out, the
+value true is assumed.
+
+There are two kinds of options.
+
+*** Global Options
+
+Are used when every task can work with the same option (e.g. verbose).
+
+Those are given on the commandline before the command.
+
+*** Local Options
+
+Those are only sensible for one of the tasks. On the commandline those
+come after the task.
+
 ** Todos
-*** GENNERAL
-    do as much as possible at runtime. best to just create one or two
-    structs at compile time, that transport compile time information
-    to the runtime.
 
-*** COMMANDS
-    commands are taken by @Command on methods
-*** FLAGS
-
-    Flags are special options. always true or false, but you do not
-    have to give this as parameter. simply quoting the flag is
-    enough. As they always default to false.
-
-**** DONE parse long flags
-**** TODO parse short flags
-**** DONE flags
-   - taken from method parameters
-   - are always true or false
-**** TODO how to associate short flag with long flag
-     @Flag("long", "short", "description")
-     long is given in the parameters of the method
-*** OPTIONS
-**** TODO how to access global options or options from a parent command
-     thor references them with parent_options
-*** SUBCOMMANDS
-**** TODO how to do subcommands
-*** STYLE
-**** DONE rename to dli
-**** DONE create logo
-(require 'org-inlinetask)
+*** Subtasks
+*** Short versions for options and tasks

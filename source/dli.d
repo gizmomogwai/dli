@@ -10,6 +10,11 @@ import std.traits;
 import std.string;
 import dunit.toolkit;
 
+/++
+ + Option represents a option in the task/option tree of the DLI subclass.
+ + Its values are initialized to false by default, and are updated with the
+ + values from the commandline.
+ +/
 class Option {
   string name;
   string shortname;
@@ -51,11 +56,19 @@ class Option {
 
     return defaultValue;
   }
+
+  string getName() {
+    return name;
+  }
+
   override string toString() {
     return format("--%s (%s)", name, defaultValue);
   }
 }
 
+/++
+ + setter and getter
+ +/
 unittest {
   auto tested = new Option("t", "false");
   tested.getValue().assertEqual("false");
@@ -63,6 +76,18 @@ unittest {
   tested.getValue().assertEqual("ttt");
 }
 
+/++
+ + construct option from commandline expression.
+ +/
+unittest {
+  auto tested = Option.fromExpression("test=blub");
+  tested.getValue().assertEqual("blub");
+  tested.getName().assertEqual("test");
+}
+
+/++
+ + helper to check for an UDA on a member.
+ +/
 static bool hasAttribute(T, S, string member)() {
   static if (__traits(hasMember, T, member)) {
     return hasUDA!(__traits(getMember, T, member), S);
@@ -71,6 +96,9 @@ static bool hasAttribute(T, S, string member)() {
   }
 }
 
+/++
+ + calls a function for each member with a given UDA.
+ +/
 template foreachMemberWithAttribute(T, A) {
   string foreachMemberWithAttribute(string function(string) dg) {
     string res;
@@ -83,6 +111,9 @@ template foreachMemberWithAttribute(T, A) {
   }
 }
 
+/++
+ + example usage of foreachMemberWithAttribute
+ +/
 unittest {
   class Testerle {
     @Option int aVariable;
@@ -93,6 +124,9 @@ unittest {
   foreachMemberWithAttribute!(Testerle, Task)(s => s).assertEqual("aMethod");
 }
 
+/++
+ + creates the block used for each task in a class.
+ +/
 string createTaskInfo(T, string member)() {
   string res;
   res ~= "  {\n    Option[] options;\n";
@@ -103,6 +137,10 @@ string createTaskInfo(T, string member)() {
   return res;
 }
 
+/++
+ + transports the needed static information to the runtime.
+ + All Tasks of a class are collected as well as the global options of the class.
+ +/
 string createTransformStaticToRuntimeMethod(T)() {
   string res;
   res ~= "override protected Tasks transformStaticToRuntime() {\n";
@@ -119,6 +157,10 @@ string createTransformStaticToRuntimeMethod(T)() {
   return res;
 }
 
+/++
+ + creates the execute methods that is needed to translate a string to the right method at runtime.
+ + Before calling the method all globals are set to the commandline parameters.
+ +/
 string createExecute(T)() {
   string res;
   res ~= "override void execute(TaskInfo ti) {\n";
@@ -144,10 +186,10 @@ string createExecute(T)() {
   return res;
 }
 
-bool isOption(string arg) {
-  return arg.startsWith("--");
-}
-
+/++
+ + creates all necessary methods for a class to be useful at runtime.
+ + please mixin this into subclasses of Dli.
+ +/
 string createDli(T)() {
   string res;
   res ~= createTransformStaticToRuntimeMethod!(T)();
@@ -155,6 +197,9 @@ string createDli(T)() {
   return res;
 }
 
+/++
+ + Creates a toString representation of a Options array.
+ +/
 string toString(Option[] options, int offset) {
   string res;
   foreach (option; options) {
@@ -163,6 +208,9 @@ string toString(Option[] options, int offset) {
   return res;
 }
 
+/++
+ + information about a task.
+ +/
 class TaskInfo {
   string name;
 
@@ -247,10 +295,16 @@ public class Tasks {
   }
 }
 
-struct Task {
+/++
+ + use this a UDA on a method to mark the method as a task.
+ +/
+public struct Task {
 }
 
-class Dli {
+/++
+ + Parentclass that should be extended for own usage.
+ +/
+public class Dli {
   Tasks tasks;
   this() {
     tasks = transformStaticToRuntime();
@@ -291,6 +345,7 @@ class Dli {
       }
     }
   }
+
   private auto applyTaskOptions(T, U)(T parseResult, U command) {
     auto task = tasks.get(command.name);
     foreach (o; command.options) {
@@ -302,6 +357,9 @@ class Dli {
     return task;
   }
 
+  /++
+   + call this with the commandline arguments (minus the first one).
+   +/
   public void start(string[] args) {
     auto parseResult = parse(args);
     applyGlobalOptions(parseResult);
@@ -316,10 +374,23 @@ struct Command {
   Option[string] options;
 }
 
+/++
+ + checks if a commandline string is an option.
+ +/
+bool isOption(string arg) {
+  return arg.startsWith("--");
+}
+
+/++
+ + checks if the commandline string is the last one.
+ +/
 bool finishOptionParsing(string arg) {
   return arg == "-" || arg == "--";
 }
 
+/++
+ + returns the option expression after a commandline string was recognized as a option.
+ +/
 string getOptionExpression(string arg) {
   return arg[2..$];
 }
