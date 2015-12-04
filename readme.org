@@ -22,7 +22,7 @@ e.g. for a commandline like
 
 your method would be called like this:
 #+BEGIN_SRC d
-test(string interactive/* with "true" */, string verbose/* with "3" */);
+test(string interactive/* with "true" */, int logLevel/* with 3 */);
 #+END_SRC
 
 The 'help' task is already predefined in Dli, so every program should
@@ -31,7 +31,8 @@ have sinsible help.
 ** Options
 
 Options are always written as --name=value. If value is left out, the
-value true is assumed.
+value true is assumed. Options are converted from strings to the real
+types by using std.conv.to!(DeclaredType).
 
 There are two kinds of options.
 
@@ -41,10 +42,15 @@ Are used when every task can work with the same option (e.g. verbose).
 
 Those are given on the commandline before the command.
 
+The type of those options is the type of the field.
+
 *** Local Options
 
-Those are only sensible for one of the tasks. On the commandline those
-come after the task.
+Those are only sensible for one of the tasks.
+
+On the commandline those come after the task.
+
+The type of those options is the type of the parameter.
 
 ** Todos
 

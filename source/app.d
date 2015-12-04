@@ -31,18 +31,19 @@ class Git : Dli {
     executor = e;
   }
 
-  @Option string verbose;
+  @Option int logLevel;
 
-  @Option string dryRun;
+  @Option string message;
 
-  @Task void add(string interactive) {
-    executor.execute(format("add %s, %s, %s", verbose, dryRun, interactive));
+  @Task void add(int interactive) {
+    executor.execute(format("add %s, %s, %s", logLevel, message, interactive));
   }
 
-  @Task void remote(string interactive) {
-    executor.execute(format("remote %s, %s, %s", verbose, dryRun, interactive));
+  @Task void remote(int interactive) {
+    executor.execute(format("remote %s, %s, %s", logLevel, message, interactive));
   }
 
+  pragma(msg, createDli!(Git));
   mixin(createDli!(Git));
 }
 

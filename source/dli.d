@@ -1,6 +1,7 @@
 module dli;
 
 import std.stdio;
+import std.range;
 import std.traits;
 import std.format;
 import std.algorithm;
@@ -165,17 +166,20 @@ string createTransformStaticToRuntimeMethod(T)() {
 string createExecute(T)() {
   string res;
   res ~= "override void execute(TaskInfo ti) {\n";
+  res ~= "  import std.conv;\n";
   res ~= foreachMemberWithAttribute!(T, Option)
-    (member => "  " ~ member ~ " = tasks.getOption(\"" ~ member ~ "\").value;\n");
+    (member => "  " ~ member ~ " = tasks.getOption(\"" ~ member ~ "\").value.to!(TypeOfField!(typeof(this), \"" ~ member ~ "\"));\n");
 
   res ~= "  switch (ti.name) {\n";
   foreach (member; __traits(allMembers, T)) {
     static if (hasAttribute!(T, Task, member)) {
       res ~= "    case \"" ~ member ~ "\":\n";
-
       string[] h;
-      foreach (parameterIdentifier; ParameterIdentifierTuple!(__traits(getMember, T, member))) {
-        h ~= "      ti.get(\"" ~ parameterIdentifier ~ "\").value";
+      alias types = Parameters!(__traits(getMember, T, member));
+      auto names = ParameterIdentifierTuple!(__traits(getMember, T, member));
+      foreach (i, n; names) {
+        auto t = fullyQualifiedName!(types[i]);
+        h ~= "(ti.get(\"" ~ n ~ "\").value).to!" ~ t;
       }
       res ~= "      " ~ member ~ "(" ~ h.join(", ") ~ ");\n";
       res ~= "      break;\n";
@@ -472,4 +476,80 @@ unittest {
   auto o1 = command1.options["quiet"];
   o1.name.assertEqual("quiet");
   o1.value.assertEqual("true");
+}
+
+unittest {
+  class Test {
+    int v;
+  }
+  writeln(typeid(TypeOfField!(Test, "v")));
+}
+
+
+
+/**
+ * Copyright: Copyright (c) 2009-2011 Jacob Carlborg.
+ * Authors: Jacob Carlborg
+ * Version: Initial created: Oct 5, 2009
+ * License: $(LINK2 http://www.boost.org/LICENSE_1_0.txt, Boost Software License 1.0)
+ */
+
+/**
+ * Evaluates to true if T has a field with the given name
+ *
+ * Params:
+ *         T = the type of the class/struct
+ *         field = the name of the field
+ */
+template hasField (T, string field) {
+  enum hasField = hasFieldImpl!(T, field, 0);
+}
+
+private template hasFieldImpl (T, string field, size_t i) {
+  static if (T.tupleof.length == i) {
+    enum hasFieldImpl = false;
+  } else static if (nameOfFieldAt!(T, i) == field) {
+      enum hasFieldImpl = true;
+  } else {
+    enum hasFieldImpl = hasFieldImpl!(T, field, i + 1);
+  }
+}
+
+/**
+ * Evaluates to the type of the field with the given name
+ *
+ * Params:
+ *         T = the type of the class/struct
+ *         field = the name of the field
+ */
+template TypeOfField (T, string field) {
+  static assert(hasField!(T, field), "The given field \"" ~ field ~ "\" doesn't exist in the type \"" ~ T.stringof ~ "\"");
+
+  alias TypeOfFieldImpl!(T, field, 0) TypeOfField;
+}
+
+private template TypeOfFieldImpl (T, string field, size_t i) {
+  static if (nameOfFieldAt!(T, i) == field) {
+    alias typeof(T.tupleof[i]) TypeOfFieldImpl;
+  } else {
+    alias TypeOfFieldImpl!(T, field, i + 1) TypeOfFieldImpl;
+  }
+}
+
+/**
+ * Evaluates to a string containing the name of the field at given position in the given type.
+ *
+ * Params:
+ *         T = the type of the class/struct
+ *         position = the position of the field in the tupleof array
+ */
+template nameOfFieldAt (T, size_t position) {
+  static assert (position < T.tupleof.length, format!(`The given position "`, position, `" is greater than the number of fields (`, T.tupleof.length, `) in the type "`, T, `"`));
+
+  enum nameOfFieldAt = __traits(identifier, T.tupleof[position]);
+}
+unittest {
+  import std.conv;
+  "tRuE".to!(bool).assertTrue();
+  "fAlSe".to!(bool).assertFalse();
 }
